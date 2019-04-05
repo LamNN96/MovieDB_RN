@@ -6,6 +6,7 @@ export default class Favourite extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      
     };
   }
 
