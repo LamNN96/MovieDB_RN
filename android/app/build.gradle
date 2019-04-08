@@ -147,7 +147,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-base:16.0.1"
     implementation project(':react-native-firebase')
     implementation "com.google.firebase:firebase-core:16.0.6" 
-    implementation "com.google.firebase:firebase-firestore:18.1.0" 
+    implementation "com.google.firebase:firebase-firestore:17.1.5" 
     implementation "com.google.firebase:firebase-database:16.1.0"
     implementation "com.google.firebase:firebase-auth:16.2.0"
     compile 'com.android.support:multidex:1.0.0' 

@@ -21,6 +21,7 @@ import ItemCarousel from "./ItemCarousel";
 import styles from "../themes/default/styles";
 import { FlatList } from "react-native-gesture-handler";
 import ItemCategory from "./ItemCategory";
+import Axios from "axios";
 
 export default class Home extends Component {
   constructor(props) {
@@ -36,18 +37,17 @@ export default class Home extends Component {
 
   componentDidMount() {
     let data = _.map(this.state.data, item => {
-      let formData = new FormData();
-      formData.append("api_key", apiKey);
-      formData.append("language", "en-US");
-      formData.append("page", "1");
       const api = `${movieApi}${item.url}`;
-      fetch(api, {
-        method: "POST",
-        body: formData
-      })
-        .then(response => response.json())
-        .then(responseJson => {
-          const data = responseJson.results;
+      Axios
+        .get(api, {
+          params: {
+            api_key: apiKey,
+            language: "en-US",
+            page: "1"
+          }
+        })
+        .then(res => {
+          const data = res.data.results;
           item.url == "popular"
             ? this.setState({
               movieSliders: data.slice(0, 5),

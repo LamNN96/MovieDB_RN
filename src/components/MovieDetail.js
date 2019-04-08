@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { View, Text, Image } from "react-native";
 import Header from "./Header";
-import { ScrollView, FlatList } from "react-native-gesture-handler";
+import { ScrollView, FlatList, TouchableOpacity } from "react-native-gesture-handler";
 import styles from "../themes/default/styles";
 import Loading from "./Loading";
 import { apiKey, movieApi } from "../configs/constants";
 import axios from "axios";
 import ItemMovie from "./ItemMovie";
+import firebase from "react-native-firebase";
+import Toast, {DURATION} from 'react-native-easy-toast'
 
 export default class MovieDetail extends Component {
   constructor(props) {
@@ -16,6 +18,7 @@ export default class MovieDetail extends Component {
       isLoading: true
     };
     this.item = this.props.navigation.state.params.item;
+    this.ref = firebase.firestore().collection('favourites');
   }
 
   componentDidMount() {
@@ -35,6 +38,29 @@ export default class MovieDetail extends Component {
       .catch(e => {
         console.log(e);
       });
+  }
+
+  onAddPress = () => {
+    const { navigation } = this.props;
+    const item = this.item;
+    const favouritesRef = this.ref;
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        favouritesRef
+          .doc(user._user.uid)
+          .collection('movies')
+          .add({
+            data: item
+          }).then(doc => {
+            const title = item.name
+            this.refs.toast.show(`${title} added to your Favourite!`);
+          }).catch(err => {
+            console.log(err)
+          })
+      } else {
+        navigation.navigate("Login")
+      }
+    });
   }
 
   keyExtractor = (item, index) => index.toString();
@@ -63,9 +89,9 @@ export default class MovieDetail extends Component {
               <Text>Director: </Text>
               <Text>Actor: </Text>
             </View>
-            <View style={styles.addToFavoritePanel}>
+            <TouchableOpacity style={styles.addToFavoritePanel} onPress={this.onAddPress}>
               <Text>Add</Text>
-            </View>
+            </TouchableOpacity>
           </View>
           <Text>Related</Text>
           {isLoading ? (
@@ -80,6 +106,7 @@ export default class MovieDetail extends Component {
               />
             )}
         </ScrollView>
+        <Toast ref="toast"/>
       </View>
     );
   }
